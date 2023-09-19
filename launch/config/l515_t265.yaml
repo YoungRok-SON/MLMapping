@@ -12,23 +12,28 @@ mlmapping_am_n_Rho:         100
 mlmapping_am_n_Z_below:      20
 mlmapping_am_n_Z_over:        5
 
-#Lolbalmap papameter
+#Localmap parameter
 #n_xy/n_z available value     5x(2n+1)  5x(odd number)  E.g 27 39 45 75 81 135 165 195 495...
-mlmapping_lm_d_xyz:           0.2
-mlmapping_lm_n_xy:            95
-mlmapping_lm_n_z:             35
+mlmapping_lm_d_xyz:             0.2
+mlmapping_lm_n_xy:              95
+mlmapping_lm_n_z:               35
 mlmapping_lm_log_odds_min:      -2.0
-mlmapping_lm_log_odds_max:       4.0
-mlmapping_lm_measurement_hit:    0.7
-mlmapping_lm_measurement_miss:  -0.4
-mlmapping_lm_occupied_sh:        2.2
+mlmapping_lm_log_odds_max:      3.2
+mlmapping_lm_measurement_hit:   0.7
+mlmapping_lm_measurement_miss:  -0.9
+mlmapping_lm_occupied_sh:       2.0
 
 
-use_exactsync:     false
+use_exactsync:              false
+# YR
+use_odom:                   false
+use_exploration_frontiers:  true
+# YR
 mlmapping_sample_cnt:       500
 mlmapping_use_raycasting:   true
-mlmapping_enable_esdfs:     false
-mlmapping_enable_2d_grid:   false
+mlmapping_enable_esdfs:     true
+mlmapping_enable_2d_grid:   true
+
 
 publish_T_wb:      true
 publish_T_bs:      true
@@ -62,8 +67,4 @@ batch_max_search_range:  15
 
 
 #visulization
-visulize_raycasting: false
-
-
-
-
+visulize_raycasting: true

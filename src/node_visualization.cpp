@@ -25,25 +25,28 @@ void localmap_msg_callback(const mlmapping::localmapConstPtr local_map_msg)
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "visulization node");
+  ros::init(argc, argv, "visulization_node");
   ros::NodeHandle nh;
-  string configFilePath;
-  nh.getParam("/mlmapping_configfile",   configFilePath);
+  string configFilePath = "/home/youngmoney/catkin_ws/src/MLMapping/launch/config/l515_t265.yaml";
+  // nh.getParam("/mlmapping_configfile",   configFilePath); //this is commented by YR
   //init map and publisher
   //awareness_map
   awareness_map = new awareness_map_cylindrical();
   awareness_map->init_map(getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Rho"),
                           getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Phi_deg"),
                           getDoubleVariableFromYaml(configFilePath,"mlmapping_am_d_Z"),
-                          getIntVariableFromYaml(configFilePath,"mlmapping_am_n_Rho"),
-                          getIntVariableFromYaml(configFilePath,"mlmapping_am_n_Z_below"),
-                          getIntVariableFromYaml(configFilePath,"mlmapping_am_n_Z_over"),false);
+                          getIntVariableFromYaml   (configFilePath,"mlmapping_am_n_Rho"),
+                          getIntVariableFromYaml   (configFilePath,"mlmapping_am_n_Z_below"),
+                          getIntVariableFromYaml   (configFilePath,"mlmapping_am_n_Z_over"),
+                          false);
+  ROS_INFO("test1");
   awareness_map->map_tmp.release();
   awareness_map_rviz_pub =  new rviz_vis();
   awareness_map_rviz_pub->set_as_awareness_map_publisher(nh,"/awareness_map",getStringFromYaml(configFilePath,"awareness_frame_id"),3,awareness_map);
   ros::Subscriber sub1 = nh.subscribe("/mlmapping_awareness", 1, awarenessmap_msg_callback);
   //local_map
   local_map = new local_map_cartesian();
+  ROS_INFO("test2");
   local_map->init_map(getDoubleVariableFromYaml(configFilePath,"mlmapping_lm_d_xyz"),
                       static_cast<unsigned int>(getIntVariableFromYaml(configFilePath,"mlmapping_lm_n_xy")),
                       static_cast<unsigned int>(getIntVariableFromYaml(configFilePath,"mlmapping_lm_n_z")),
@@ -53,6 +56,7 @@ int main(int argc, char **argv)
                       static_cast<float>(getDoubleVariableFromYaml(configFilePath,"mlmapping_lm_measurement_miss")),
                       static_cast<float>(getDoubleVariableFromYaml(configFilePath,"mlmapping_lm_occupied_sh")),
                       getBoolVariableFromYaml(configFilePath,"use_exploration_frontiers"));
+  ROS_INFO("test3");
   local_map->allocate_memory_for_local_map();
   local_map_rviz_pub = new rviz_vis();
   local_map_rviz_pub->set_as_local_map_publisher(nh,"/local_map",

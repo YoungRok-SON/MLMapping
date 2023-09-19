@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+
+<!-- <node pkg="mlmapping" type="visualization" name="visualization" output="screen" /> -->
+
+<!--mlmapping##################################################################################################-->
+<param name="/mlmapping_configfile" type="string" value="$(find mlmapping)/launch/config/l515_t265.yaml"/>
+<!-- <param name="/mlmapping_configfile" type="string" value="/home/youngmoney/catkin_ws/src/MLMapping/launch/config/l515_t265.yaml"/> -->
+
+    <!-- Manager -->
+        <node pkg="nodelet" type="nodelet"
+            name="mlmapping_nodelet_manager" args="manager" output="screen">
+            <param name="num_worker_threads" value="4" />
+        </node>
+    
+    </launch>

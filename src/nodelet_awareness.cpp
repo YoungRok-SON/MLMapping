@@ -309,7 +309,8 @@ namespace mlmapping_ns
 
             if (use_exactsync)
             {
-                pc_sub.subscribe(nh, "/mlmapping/pc", 10);
+                pc_sub.subscribe(nh, "/camera1/depth/color/points", 10);
+                // pc_sub.subscribe(nh, "/mlmapping/pc", 10);
                 if (use_odom)
                 {
                     odom_sub.subscribe(nh, "/mlmapping/odom", 10);

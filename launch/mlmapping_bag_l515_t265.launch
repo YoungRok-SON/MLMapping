@@ -2,13 +2,14 @@
 <launch>
     <param name ="/use_sim_time" value="true"/>
 <!--Input######################################################################################################-->
-    <node pkg="rosbag" type="play" name="rosbag" output="log" args="$(find mlmapping)/bag/corridor.bag -r1 --clock">
+    <node pkg="rosbag" type="play" name="rosbag" output="log" args="/mnt/e/corridor.bag  --clock">
     </node>
 
 <!--rviz#######################################################################################################-->
-<!--    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find mlmapping)/launch/config/mlmapping.rviz" />-->
+   <node type="rviz" name="rviz" pkg="rviz" args="-d $(find mlmapping)/launch/config/mlmapping.rviz" />
 
 <!--visualization##############################################################################################-->
+    <param name="/mlmapping_configfile" type="string" value="$(find mlmapping)/launch/config/l515_t265.yaml"/>
 
     <node pkg="mlmapping" type="visualization" name="visualization" output="screen" />
 
@@ -17,18 +18,18 @@
 
     <!-- Manager -->
     <node pkg="nodelet" type="nodelet"
-          name="mlmapping_nodelet_manager" args="manager" output="screen">
+          name="mlmapping_nodelet_manager" args="manager" >
           <param name="num_worker_threads" value="4" />
     </node>
 
     <node pkg="nodelet" type="nodelet" args="load mlmapping/AwarenessMapNodeletClass mlmapping_nodelet_manager"
-        name="awareness_loader" output="screen">
+        name="awareness_loader" >
         <remap from="/mlmapping/pc"          to="/camera1/depth/color/points"/>
         <remap from="/mlmapping/pose"        to="/mavros/local_position/pose"/>
     </node>
 
     <node pkg="nodelet" type="nodelet" args="load mlmapping/LocalMapNodeletClass mlmapping_nodelet_manager"
-        name="localmap_loader" output="screen">
+        name="localmap_loader" >
     </node>
 
 </launch>
