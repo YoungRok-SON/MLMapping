@@ -115,13 +115,14 @@ Vec3 cubeColer(double ratio)
 
     return Vec3(red / 260.0, grn / 260.0, blu / 260.0);
 }
-
+// Brief
+// awareness_map의 데이터를 받아서 rviz에 띄울 수 있는 포맷으로 전부 바꿔줌
 void rviz_vis::pub_awareness_map(awareness_map_cylindrical *localmap, const ros::Time stamp)
 {
     visualization_msgs::Marker spheres;
     spheres.header.frame_id = this->frame_id;
     spheres.header.stamp = stamp;
-    spheres.ns = "points";
+    spheres.ns = "points"; // ns는 namespace 줄임말
     spheres.type = visualization_msgs::Marker::SPHERE_LIST;
     spheres.action = visualization_msgs::Marker::ADD;
     spheres.pose.orientation.w = 1.0;
@@ -142,7 +143,7 @@ void rviz_vis::pub_awareness_map(awareness_map_cylindrical *localmap, const ros:
         //        color.g= static_cast<float>(rgb(1));
         //        color.b= static_cast<float>(rgb(2));
         //        color.a= static_cast<float>(0.9);
-        color.r = static_cast<float>(1.0);
+        color.r = static_cast<float>(1.0); // 이러면 아에 안보이는 거 아닌가? 그럼 이 코드도 필요 없고
         color.g = static_cast<float>(1.0);
         color.b = static_cast<float>(1.0);
         color.a = static_cast<float>(1.0);
@@ -188,6 +189,8 @@ void rviz_vis::pub_local_map(local_map_cartesian *localmap, const ros::Time stam
         this->map_pub.publish(cubes);
     }
     // publish the range
+    // 이 range라는 놈은 뭐하는 놈이지? 
+    // 왜 2, 3까지 있는거지?
     visualization_msgs::Marker range;
     range.header.frame_id = this->frame_id;
     range.header.stamp = ros::Time();

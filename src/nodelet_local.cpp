@@ -153,6 +153,7 @@ private:
     nh.getParam("/mlmapping_configfile",   configFilePath);
     cout << "read the config file" << endl;
 
+    // Nodelet Initialization
     local_map = new local_map_cartesian();
     local_map->init_map(getDoubleVariableFromYaml(configFilePath,"mlmapping_lm_d_xyz"),
                         static_cast<unsigned int>(getIntVariableFromYaml(configFilePath,"mlmapping_lm_n_xy")),

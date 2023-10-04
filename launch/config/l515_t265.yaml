@@ -4,7 +4,8 @@
 #devition of orientation 360/d_Phi_deg
 #n_Z = Z_below + Z_over + 1;
 #Number of grid n_Rho*(360/d_Phi)*(nz_below+nz_over+1)
-
+# 지금 이 config는 diameter 10m, 높이 2.6 미터의 실린더 공간을 보고 있는거
+# 셀의 크기는 대략 468,000개 
 mlmapping_am_d_Rho:         0.1
 mlmapping_am_d_Phi_deg:       2
 mlmapping_am_d_Z:           0.1
@@ -29,7 +30,7 @@ use_exactsync:              false
 use_odom:                   false
 use_exploration_frontiers:  true
 # YR
-mlmapping_sample_cnt:       500
+mlmapping_sample_cnt:       500   # 뭐하는데 필요한 놈이지 이거
 mlmapping_use_raycasting:   true
 mlmapping_enable_esdfs:     true
 mlmapping_enable_2d_grid:   true

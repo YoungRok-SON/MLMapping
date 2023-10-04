@@ -2,16 +2,21 @@
 <launch>
     <param name ="/use_sim_time" value="true"/>
     <!--sim_planner1-->
+<!--  원하는 백 트는 코드 -->
 <!--Input######################################################################################################-->
     <node pkg="rosbag" type="play" name="rosbag" output="log" args="$(find mlmapping)/bag/lab.bag -r3 --clock">
     </node>
 
+<!-- Rviz 켜는 코드, mlmapping.rivz 설정으로 킴 -->
 <!--rviz#######################################################################################################-->
-<!--    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find mlmapping)/launch/config/mlmapping.rviz" />-->
+   <node type="rviz" name="rviz" pkg="rviz" args="-d $(find mlmapping)/launch/config/mlmapping.rviz" />
 
+<!-- 이 visualization 이란 놈이 뭐하는 놈인지 모르겠음 -->
+<!-- 실제로 Visualziation은 rviz에서 다하고... visualziation을 위한 데이터를 만들어서 볼 수 있게 해주는 놈인지 확인 필요 -->
 <!--visualization##############################################################################################-->
     <node pkg="mlmapping" type="visualization" name="visualization" output="log" />
 
+<!-- config 폴더에서 d435i 컨피그 사용 -->
 <!--mlmapping##################################################################################################-->
     <arg name="node_start_delay"  default="1.0" />
     <param name="/mlmapping_configfile" type="string" value="$(find mlmapping)/launch/config/d435i_mit_flvis.yaml"/>
@@ -20,14 +25,19 @@
     <node pkg="nodelet" type="nodelet"
           name="mlmapping_nodelet_manager" args="manager" output="screen">
           <param name="num_worker_threads" value="4" />
+          <!-- 쓰레드 개수 4개 사용하는데 더 사용하면 더 빨라지나? 아니면 덜 버벅더리나? -->
     </node>
 
+    <!-- Awareness Map Nodelet 클래스 키는 부분 -->
     <node pkg="nodelet" type="nodelet" args="load mlmapping/AwarenessMapNodeletClass mlmapping_nodelet_manager"
         name="awareness_loader" output="screen">
+        <!-- 이게 코드 마다 다른데 PC랑 포즈만 있으면 되는지  -->
+        <!-- IMU 있는 코드는 그냥 확인용인가..? -->
         <remap from="/mlmapping/pc"          to="/camera/depth/color/points"/>
         <remap from="/mlmapping/pose"        to="/imu_pose"/>
     </node>
 
+    <!-- Local Mapping 및 Global Mapping 쓰레드 키는 부분 -->
     <node pkg="nodelet" type="nodelet" args="load mlmapping/LocalMapNodeletClass mlmapping_nodelet_manager"
         name="localmap_loader" output="screen">
     </node>

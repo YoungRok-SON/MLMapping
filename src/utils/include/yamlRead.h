@@ -38,7 +38,6 @@ inline bool getBoolVariableFromYaml(string FilePath, string vName)
 {
   YAML::Node config = YAML::LoadFile(FilePath);
   std::cout << config << std::endl;
-  std::cout << "test4" << std::endl;
   const bool ret = config[vName].as<bool>();
   return ret;
 }

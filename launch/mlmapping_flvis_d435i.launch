@@ -29,6 +29,7 @@
         <remap from="/mlmapping/pose"        to="/imu_pose"/>
     </node>
 
+<!-- 여기서는 왜 Local/Global 쓰레드안키는거지..? -->
 <!--    <node pkg="nodelet" type="nodelet" args="load mlmapping/LocalMapNodeletClass mlmapping_nodelet_manager"
         name="localmap_loader" output="screen"
         launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">

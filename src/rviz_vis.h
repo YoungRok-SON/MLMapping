@@ -14,7 +14,6 @@ class rviz_vis
 public:
     rviz_vis();
     ~rviz_vis();
-
     ros::Publisher map_pub;
     string frame_id;
     double min_z;

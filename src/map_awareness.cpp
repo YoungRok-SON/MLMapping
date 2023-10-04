@@ -252,9 +252,13 @@ void awareness_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
 
     // STEP 1: transfer from previous map
     // Frame [w]orld, [s]ensor, [b]ody, [l]ocalmap; [g]lobalmap
-    T_wa = SE3(SO3(Quaterniond(1, 0, 0, 0)), T_wb.translation());
-    SE3 T_ws = T_wb * this->T_bs;
-    SE3 T_ls = T_wa.inverse() * T_ws;
+    T_wa = SE3(SO3(Quaterniond(1, 0, 0, 0)), T_wb.translation()); // awareness == body
+    // Awareness랑 world랑은 X축 일치하게 둬서 방향은 안바꾸고 평행이동 값만 넣어줌
+    SE3 T_ws = T_wb * this->T_bs; // b2w * s2b --> s to b to w
+    SE3 T_ls = T_wa.inverse() * T_ws; // s2w -> w2a --> 결국 sensor to awareness..
+    // 왜 이름이 T_ls일까 ls는 결국 sensor to awareness
+    
+    /* // 그냥 디버깅용 코드인가봄
     // only for visualization, not used.
     // if(first_input)
     // {
@@ -286,11 +290,14 @@ void awareness_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
     //             }
     //         }
     //     }
-    // }
+    // } */
+    
     // STEP 2: Add measurement
-    for (auto p_s : PC_s)
+    for (auto p_s : PC_s) //PC_s는 egien matrix로 xyz 데이터만 담아서 사용
     {
+        // Awareness frame으로 위치 변환
         auto p_l = T_ls * p_s;
+        //  Eigen::Matrix<int, 3, 1> == Vec3I
         Vec3I rpz_idx;
         bool can_do_cast;
         size_t map_idx;

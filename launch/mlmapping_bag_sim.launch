@@ -14,6 +14,7 @@
 
 <!--mlmapping##################################################################################################-->
     <arg name="node_start_delay"  default="1.0" />
+    <!-- param은 <node> 바깥에다가 쓰면 모든 노드에 다 적용되나 본데? -->
     <param name="/mlmapping_configfile" type="string" value="$(find mlmapping)/launch/config/config.yaml"/>
 
     <!-- Manager -->
@@ -29,6 +30,7 @@
         <!-- <remap from="/mlmapping/pc"          to="/filtered_RadiusOutlierRemoval"/> -->
         <remap from="/mlmapping/pose"        to="/mavros/local_position/pose"/>
         <!-- Odom or pose -->
+        <!-- 이 odom이라는 친구는 어디서 나온걸까 -->
         <remap from="/mlmapping/odom"        to="/vicon_imu_ekf_odom"/>
     </node>
 

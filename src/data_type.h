@@ -8,9 +8,9 @@ struct CYLINDRICAL_CELL{
   unsigned int idx_rho;
   unsigned int idx_phi;
   unsigned int idx_z;
-  Vec3 center_pt;
-  Vec3 sampled_xyz;
-  double raycasting_z_over_rho;
+  Vec3 center_pt; // 원통 좌표계 안 하나의 셀에 대한 센터 좌표
+  Vec3 sampled_xyz; // 뭘 샘플한건지 모르겠음
+  double raycasting_z_over_rho; // raycasting 유무인가?
   bool is_occupied;
 };
 
