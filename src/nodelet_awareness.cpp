@@ -131,7 +131,7 @@ namespace mlmapping_ns
             {
                 for (int i = 0; i < pc_sample_cnt; i++)
                 {
-                    size_t rand_idx = static_cast<size_t>(rand() % pcsize);
+                    size_t rand_idx = static_cast<size_t>(rand() % pcsize); // 
                     PointP pt = cloud->at(rand_idx);
                     pc_eigen.push_back(Vec3(static_cast<double>(pt.x),
                                             static_cast<double>(pt.y),

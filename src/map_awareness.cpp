@@ -7,14 +7,16 @@ inline double awareness_map_cylindrical::fast_atan2(double y, double x)
     double a_input = abs(input);
     double res;
     //   int sign = a_input/input;
-    if (a_input > 1)
+    if (a_input > 1) // 이 1의 의미가 뭐지..? --> y=x를 기준으로 나눠서 
     {
         res = copysign(deg2rad * (90 - fast_atan(1 / a_input)), input);
     }
-    else
+    else // 부호 바꾸는 부분
     {
         res = copysign(deg2rad * fast_atan(a_input), input);
     }
+
+    // 어느 사분면에 있는지 확인하여 부호를 바꿔줌
     if (x > 0)
     {
         return res;
@@ -29,10 +31,12 @@ inline double awareness_map_cylindrical::fast_atan2(double y, double x)
     }
 }
 
+// 숫자 다 줄여가지고 atan 함수를 만듦
 inline double awareness_map_cylindrical::fast_atan(double x)
 {
     return x * (45 - (x - 1) * (14 + 3.83 * x));
 }
+
 awareness_map_cylindrical::awareness_map_cylindrical()
 {
 }
@@ -56,6 +60,12 @@ void awareness_map_cylindrical::setTbs(SE3 T_bs_in)
     this->T_bs = T_bs_in;
 }
 
+
+// Input  : 로, 파이, 높이에 대한 간격 값, 개수, 래이캐스팅 유무
+// Output : none
+// Brief
+// 1. 변수를 클래스 내부 변수에 저장
+// 2. 
 void awareness_map_cylindrical::init_map(double d_Rho, double d_Phi_deg, double d_Z, int n_Rho, int n_z_below, int n_z_over, bool apply_raycasting)
 {
     this->map_dRho = d_Rho;
@@ -72,11 +82,12 @@ void awareness_map_cylindrical::init_map(double d_Rho, double d_Phi_deg, double 
     this->map = std::unique_ptr<vector<CYLINDRICAL_CELL>>(new vector<CYLINDRICAL_CELL>());
     // this->map_tmp = std::unique_ptr<vector<CYLINDRICAL_CELL>>(new vector<CYLINDRICAL_CELL>());
     int idx_in_order = 0;
+    // 하드코딩 이거 뭐야 ㅋㅋㅋㅋ 
     diff_range = 10;
     for (int diff = -diff_range; diff < diff_range + 1; diff++)
     {
         vector<float> line;
-        for (int r = 0; r < n_Rho; r++)
+        for (int r = 0; r < n_Rho; r++) // ㄱ값이 n_Rho에 따라 달라짐... n_Rho 값에 따라 ...
         {
             line.emplace_back(get_odds(diff, r));
             //   cout<<"odd: "<<line.back() << " at r: "<<r<<" at diff: "<<diff<<endl;
@@ -120,24 +131,38 @@ void awareness_map_cylindrical::init_map(double d_Rho, double d_Phi_deg, double 
     visibility_check = apply_raycasting;
 }
 
+// Input  : 점의 xyz 위치( Global Coordinate )
+// Output : 로, 파이, 높이 값에 대응되는 원통형 셀의 인덱스, 캐스트 할 수 있는지
+// Brief 
+
 bool awareness_map_cylindrical::xyz2RhoPhiZwithBoderCheck(Vec3 xyz_l, Vec3I &rhophiz, bool &can_do_cast)
 {
+    // 원통형 좌표계에서 X, Y 평면 상의 거리 = rho(로)
     double rho = sqrt(pow(xyz_l(0), 2) + pow(xyz_l(1), 2));
+    // 로에 맞는 인덱스를 찾음 (거리/델타 로(간격))
     int rho_idx = static_cast<int>(rho / this->map_dRho);
     // double phi0 = atan2(xyz_l(1),xyz_l(0));
-    double phi = fast_atan2(xyz_l(1), xyz_l(0));
-    // if (abs(phi - phi0) > 3)
-    // cout<<"phi diff:"<<" "<<phi<<" "<<phi0<<" "<< xyz_l(1)/xyz_l(0)<<endl;
-    // cout<<"phi diff: "<<abs(phi - phi0) << endl;
+    
+    // 안쪽에서 경우에 따라 atan2를 구현해 버림.. 기존 펑션이 좀 느렸었나봐
+    double phi = fast_atan2(xyz_l(1), xyz_l(0)); // 각도 찾는 부분 
+
+    // fast_atan2 안쪽에서는 사분면에 대한 부호 판단만 하기 때문에
+    // 전체 크기에 대한 파이 값은 여기서 확인해주는 것 같음
     if (phi < 0)
         phi += 2 * M_PI;
+    
+    // 파이값 구하면 델타 값으로 나눠서 인덱스 구함
     int phi_idx = static_cast<int>(phi / this->map_dPhi);
+
+    // 최 하단 값을 빼줌 -> (-) 값을 빼주니까 결과적으로는 위로 올려주는 결과
     double z = xyz_l(2) - this->z_border_min;
+    // 똑같이 인덱스 구해줌
     int z_idx = static_cast<int>(floor(z / this->map_dZ));
-    rhophiz = Vec3I(rho_idx, phi_idx, z_idx);
+    rhophiz = Vec3I(rho_idx, phi_idx, z_idx); // 값 반환하기 위해 넣어주고
+    // 인덱스가 모두 0 보다 커야하고, 파이의 인덱스가 우리가 지정한 각도에 대한 값보다 작아야함 --> 캐스팅이 되는지 확인..
     can_do_cast = (rho_idx >= 0 && phi_idx >= 0 && phi_idx < this->map_nPhi);
-    if (
-        can_do_cast && z_idx >= 0 && rho_idx < this->map_nRho && z_idx < this->map_nZ)
+    // 결과적으로 구한 인덱스 값들이 옳은 값을 가지고 있고 캐스팅이 가능한지에 대해 검사
+    if (can_do_cast && z_idx >= 0 && rho_idx < this->map_nRho && z_idx < this->map_nZ)
     {
         return true;
     }
@@ -209,7 +234,8 @@ void awareness_map_cylindrical::update_hits(Vec3 p_l, Vec3I rpz_idx, size_t map_
 
     vector<Vec3I> rpz_idx_l;
     int raycasting_z;
-    double raycasting_rate = map->at(map_idx).raycasting_z_over_rho;
+    double raycasting_rate = map->at(map_idx).raycasting_z_over_rho; // 이 래이캐스팅 레이트는 뭐하는 거지...
+    // 로가 커지고, z 인덱스가 낮으면 ... 낮은 층에 바깥쪽 셀 -> 그냥 기울기
     float odd;
     Vec3I neighbor;
 
@@ -298,16 +324,18 @@ void awareness_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
         // Awareness frame으로 위치 변환
         auto p_l = T_ls * p_s;
         //  Eigen::Matrix<int, 3, 1> == Vec3I
-        Vec3I rpz_idx;
+        Vec3I rpz_idx; // 로, 파이, 높이에 대한 원통좌표계 인덱스 저장
         bool can_do_cast;
         size_t map_idx;
+        
+        // 어떤 점의 rho, phi, z에 대한 인덱스와 캐스팅 가능 여부를 검사 --> 항상 true로 나오는거 아닌가?
         bool inside_range = xyz2RhoPhiZwithBoderCheck(p_l, rpz_idx, can_do_cast);
-        if (inside_range)
+        if (inside_range) // 레인지 검사하는 부분이 없었는데 왜? 이렇게? 해놨찌?--> 최대 개수도 검사를 하니까 거기서 레인지 검사가 이미 된거
         {
             // l2g_msg_hit_pts_l.emplace_back(p_l);
 
             // set observerable
-            map_idx = mapIdx(rpz_idx);
+            map_idx = mapIdx(rpz_idx); // 전체 원통 좌표계에서 어떤 셀에 들어가 있는지 확인
             update_hits(p_l, rpz_idx, map_idx);
             // if(map->at(map_idx).is_occupied == false)
             // {
@@ -316,12 +344,13 @@ void awareness_map_cylindrical::input_pc_pose(vector<Vec3> PC_s, SE3 T_wb)
             //     this->occupied_cell_idx.emplace_back(map_idx);
             // }
         }
-        if (can_do_cast && visibility_check)
+
+        // 
+        if (can_do_cast && visibility_check) // 한 점에 대해서 래이캐스팅이 된다면
         {
             double raycasting_rate;
             if (inside_range)
             {
-
                 raycasting_rate = map->at(map_idx).raycasting_z_over_rho;
             }
             else
