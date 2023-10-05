@@ -232,6 +232,7 @@ inline void awareness_map_cylindrical::update_odds_hashmap(Vec3I rpz_idx, float 
 void awareness_map_cylindrical::update_hits(Vec3 p_l, Vec3I rpz_idx, size_t map_idx)
 {
 
+
     vector<Vec3I> rpz_idx_l;
     int raycasting_z;
     double raycasting_rate = map->at(map_idx).raycasting_z_over_rho; // 이 래이캐스팅 레이트는 뭐하는 거지...
@@ -239,10 +240,14 @@ void awareness_map_cylindrical::update_hits(Vec3 p_l, Vec3I rpz_idx, size_t map_
     float odd;
     Vec3I neighbor;
 
-    // l2g_msg_hit_pts_l.emplace_back(p_l);
-    // l2g_msg_hit_odds_l.emplace_back(get_odds_table[0+diff_range][rpz_idx[0]]);
+    // 특정 포인트의 인덱스가 들어오면 거기에 해당되는 get_odds_table에 있는 값을 수정하는 듯 함
     update_odds_hashmap(rpz_idx, get_odds_table[0 + diff_range][rpz_idx[0]]);
-    // cout<<"added odds: "<<l2g_msg_hit_odds_l.back()<<endl;
+    // Q1. 이 hit update라는 놈은 하나의 스캔 측정값에 대해 업데이트를 진행하는 건데
+    //      raycast를 통해서 그 부분이 없다는걸 인지하는 부분은 어디 있는 거지?
+    // Q2. 이전에 차있던 부분을 이번에 래이캐스팅 해서 없어졌다는 걸 인지한다면, 해쉬맵은
+    //     각 셀마다 고유한 아이디가 있는건가?
+
+    // 
     for (auto diff_r = 1; diff_r < 3 * sigma_in_dr(rpz_idx[0]) && (rpz_idx[0] + diff_r < this->map_nRho); diff_r++)
     {
         raycasting_z = static_cast<int>(round(rpz_idx[2] + (diff_r * raycasting_rate)));
